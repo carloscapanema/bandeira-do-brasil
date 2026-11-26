@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Bandeira do Brasil</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #222;
+    }
+    canvas {
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="bandeira" width="800" height="560"></canvas>
+
+  <script>
+    const canvas = document.getElementById('bandeira');
+    const ctx = canvas.getContext('2d');
+
+    const largura = canvas.width;
+    const altura = canvas.height;
+    const centroX = largura / 2;
+    const centroY = altura / 2;
+    const modulo = largura / 20;
+
+    // Retângulo Verde
+    ctx.fillStyle = '#009c3b';
+    ctx.fillRect(0, 0, largura, altura);
+
+    // Losango Amarelo
+    const margem = 1.7 * modulo;
+    ctx.beginPath();
+    ctx.moveTo(centroX, margem);
+    ctx.lineTo(largura - margem, centroY);
+    ctx.lineTo(centroX, altura - margem);
+    ctx.lineTo(margem, centroY);
+    ctx.closePath();
+    ctx.fillStyle = '#ffdf00';
+    ctx.fill();
+
+    // Círculo Azul
+    const raioCirculo = 3.5 * modulo;
+    ctx.beginPath();
+    ctx.arc(centroX, centroY, raioCirculo, 0, Math.PI * 2);
+    ctx.fillStyle = '#002776';
+    ctx.fill();
+
+    // Recorte circular
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(centroX, centroY, raioCirculo, 0, Math.PI * 2);
+    ctx.clip();
+
+    // Faixa Branca
+    const faixaCentroX = centroX - 2 * modulo;
+    const faixaCentroY = centroY + 7 * modulo;
+    const faixaRaio = 8.25 * modulo;
+    const faixaLargura = 0.5 * modulo;
+
+    ctx.beginPath();
+    ctx.arc(faixaCentroX, faixaCentroY, faixaRaio, 0, Math.PI * 2);
+    ctx.lineWidth = faixaLargura;
+    ctx.strokeStyle = '#ffffff';
+    ctx.stroke();
+
+    // Texto ORDEM E PROGRESSO
+    const texto = "ORDEM E PROGRESSO";
+    ctx.fillStyle = '#009c3b';
+    ctx.font = `bold ${Math.round(0.35 * modulo)}px Arial, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    const anguloInicial = -1.26;
+    const espacamentoAngular = 0.044;
+
+    for (let i = 0; i < texto.length; i++) {
+      const angulo = anguloInicial + i * espacamentoAngular;
+      ctx.save();
+      ctx.translate(
+        faixaCentroX + Math.cos(angulo) * faixaRaio,
+        faixaCentroY + Math.sin(angulo) * faixaRaio
+      );
+      ctx.rotate(angulo + Math.PI / 2);
+      ctx.fillText(texto[i], 0, 0);
+      ctx.restore();
+    }
+
+    // Estrelas
+    function desenharEstrela(x, y, raioExterno) {
+      const raioInterno = raioExterno * 0.38;
+      ctx.beginPath();
+      for (let i = 0; i < 10; i++) {
+        const raio = i % 2 === 0 ? raioExterno : raioInterno;
+        const angulo = (i * Math.PI) / 5 - Math.PI / 2;
+        const px = x + Math.cos(angulo) * raio;
+        const py = y + Math.sin(angulo) * raio;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+    }
+
+    const estrelas = [
+      { dx: 0.25, dy: -0.45, tam: 0.14 },
+      { dx: 0.00, dy: 0.12, tam: 0.14 },
+      { dx: 0.00, dy: 0.42, tam: 0.14 },
+      { dx: -0.14, dy: 0.26, tam: 0.14 },
+      { dx: 0.13, dy: 0.24, tam: 0.12 },
+      { dx: 0.05, dy: 0.31, tam: 0.09 },
+      { dx: -0.58, dy: 0.15, tam: 0.15 },
+      { dx: -0.68, dy: 0.28, tam: 0.11 },
+      { dx: -0.52, dy: 0.35, tam: 0.12 },
+      { dx: -0.60, dy: 0.42, tam: 0.10 },
+      { dx: -0.42, dy: 0.44, tam: 0.10 },
+      { dx: -0.65, dy: -0.12, tam: 0.14 },
+      { dx: -0.35, dy: 0.58, tam: 0.14 },
+      { dx: 0.42, dy: 0.52, tam: 0.14 },
+      { dx: 0.50, dy: 0.45, tam: 0.11 },
+      { dx: 0.56, dy: 0.40, tam: 0.11 },
+      { dx: 0.62, dy: 0.48, tam: 0.11 },
+      { dx: 0.68, dy: 0.42, tam: 0.10 },
+      { dx: 0.66, dy: 0.30, tam: 0.11 },
+      { dx: 0.58, dy: 0.25, tam: 0.11 },
+      { dx: 0.52, dy: 0.18, tam: 0.12 },
+      { dx: 0.28, dy: 0.62, tam: 0.12 },
+      { dx: 0.20, dy: 0.72, tam: 0.11 },
+      { dx: 0.36, dy: 0.70, tam: 0.11 },
+      { dx: -0.18, dy: 0.05, tam: 0.10 },
+      { dx: -0.22, dy: 0.52, tam: 0.11 },
+      { dx: 0.00, dy: 0.82, tam: 0.08 }
+    ];
+
+    estrelas.forEach(e => {
+      desenharEstrela(
+        centroX + e.dx * raioCirculo,
+        centroY + e.dy * raioCirculo,
+        e.tam * modulo
+      );
+    });
+
+    ctx.restore();
+  </script>
+</body>
+</html>
